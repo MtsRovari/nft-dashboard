@@ -1,5 +1,5 @@
-Moralis.initialize("zUAslaQCPxdWxFtnIAPVbkc9LUNAjOoN8eMCKgTw");
-Moralis.serverURL = "https://suwkhta9idij.usemoralis.com:2053/server";
+Moralis.initialize("ioh3z3xODOO2rMizrVYyRgLl5nxe6KSUtnZHsIy6");
+Moralis.serverURL = "https://j4nyc9fkxg9s.grandmoralis.com:2053/server";
 // const CONTRACT_ADDRESS = "0xfa59f3270bf5e9c6863f778bde7680e55915ffe7";
 const CONTRACT_ADDRESS = "0x57bb84aB1624c444Fc835540b6fF7414400E4ef9";
 
@@ -10,7 +10,7 @@ function fetchNFTMetadata(NFTs) {
         let nft = NFTs[i];
         let id = nft.token_id;
         //Call moralis cloud function -> static json file
-        promises.push(fetch("https://suwkhta9idij.usemoralis.com:2053/server/functions/getNFT?_ApplicationId=zUAslaQCPxdWxFtnIAPVbkc9LUNAjOoN8eMCKgTw&nftId=" + id)
+        promises.push(fetch("https://j4nyc9fkxg9s.grandmoralis.com:2053/server/functions/getNFT?_ApplicationId=ioh3z3xODOO2rMizrVYyRgLl5nxe6KSUtnZHsIy6&nftId=" + id)
         .then(res => res.json())
         .then(res => JSON.parse(res.result))
         .then(res => {nft.metadata = res})
