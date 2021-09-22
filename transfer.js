@@ -1,7 +1,6 @@
 Moralis.initialize("zUAslaQCPxdWxFtnIAPVbkc9LUNAjOoN8eMCKgTw");
 Moralis.serverURL = "https://suwkhta9idij.usemoralis.com:2053/server";
 const CONTRACT_ADDRESS = "0x57bb84aB1624c444Fc835540b6fF7414400E4ef9";
-let web3;
 
 async function init() {
     let currentUser = Moralis.User.current();
@@ -9,27 +8,28 @@ async function init() {
         window.location.pathname = "/index.html";
     }
 
-    web3 = await Moralis.Web3.enable();
-    let accounts = await web3.eth.getAccounts();
-
     const urlParams = new URLSearchParams(window.location.search);
     const nftId = urlParams.get("nftId");
     document.getElementById("token_id_input").value = nftId;
-    document.getElementById("address_input").value = accounts[0];
 }
 
-async function mint() {
+async function transfer() {
     let tokenId = parseInt(document.getElementById("token_id_input").value);
     let address = document.getElementById("address_input").value
     let amount = parseInt(document.getElementById("amount_input").value)
-    const accounts = await web3.eth.getAccounts();
-    const contract = new web3.eth.Contract(contractAbi, CONTRACT_ADDRESS);
-    contract.methods.mint(address, tokenId, amount).send({from: accounts[0], value: 0})
-    .on("receipt", function(receipt){
-        alert("Mint done")
-    })
+    
+    const options = {
+        type: "erc1155",  
+        receiver: address,
+        contract_address: CONTRACT_ADDRESS,
+        token_id: tokenId,
+        amount: amount
+    }
+
+    let result = await Moralis.transfer(options)
+    console.log(result)
 }
 
-document.getElementById("submit_mint").onclick = mint;
+document.getElementById("submit_transfer").onclick = transfer;
 
 init();
