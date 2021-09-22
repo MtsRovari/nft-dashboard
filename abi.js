@@ -1,4 +1,4 @@
-const contractAbi = [
+const contractAbi =
     [
         {
             "inputs": [],
@@ -442,4 +442,3 @@ const contractAbi = [
             "type": "function"
         }
     ]
-]

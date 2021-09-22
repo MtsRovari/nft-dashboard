@@ -2,6 +2,7 @@ Moralis.initialize("ioh3z3xODOO2rMizrVYyRgLl5nxe6KSUtnZHsIy6");
 Moralis.serverURL = "https://j4nyc9fkxg9s.grandmoralis.com:2053/server";
 // const CONTRACT_ADDRESS = "0xfa59f3270bf5e9c6863f778bde7680e55915ffe7";
 const CONTRACT_ADDRESS = "0x57bb84aB1624c444Fc835540b6fF7414400E4ef9";
+let currentUser;
 
 function fetchNFTMetadata(NFTs) {
     console.log(NFTs)
@@ -21,7 +22,7 @@ function fetchNFTMetadata(NFTs) {
         .then( (res) => {
             nft.owners = [];
             res.result.forEach(element => {
-                nft.owners.push(element.ownerOf);
+                nft.owners.push(element.owner_of);
             });
 
             return nft;
@@ -30,7 +31,7 @@ function fetchNFTMetadata(NFTs) {
     return Promise.all(promises);
 }
 
-function renderInventory (NFTs) {
+function renderInventory (NFTs, ownerData) {
     const parent = document.getElementById("app");
     for (let i = 0; i < NFTs.length; i++) {
         const nft = NFTs[i];
@@ -44,7 +45,9 @@ function renderInventory (NFTs) {
                 <p class="card-text">${nft.metadata.description}</p>
                 <p class="card-text">Tokens in circulation: ${nft.amount}</p>
                 <p class="card-text">Number of Owners: ${nft.owners.length}</p>
+                <p class="card-text">Your balance: ${ownerData[nft.token_id]}</p>
                 <a href="/mint.html?nftId=${nft.token_id}" class="btn btn-primary">Mint</a>
+                <a href="/transfer.html?nftId=${nft.token_id}" class="btn btn-primary">Transfer</a>
             </div>
         </div>
         `
@@ -55,8 +58,21 @@ function renderInventory (NFTs) {
     }
 }
 
+async function getOwnerData() {
+    let accounts = currentUser.get("accounts");
+    const options = { chain: 'rinkeby', address: accounts[0], token_address: CONTRACT_ADDRESS };
+    return Moralis.Web3API.account.getNFTsForContract(options).then((data) => {
+        let result = data.result.reduce( (object, currentElement) => {
+            object[currentElement.token_id] = currentElement.amount;
+            return object; 
+        }, {})
+        console.log(result);
+        return result;
+    })
+}
+
 async function initializeApp() {
-    let currentUser = Moralis.User.current();
+    currentUser = Moralis.User.current();
     
     if (!currentUser) {
         currentUser = await Moralis.Web3.authenticate();
@@ -65,7 +81,8 @@ async function initializeApp() {
     const options = { address: CONTRACT_ADDRESS, chain: "rinkeby" }
     let NFTs = await Moralis.Web3API.token.getAllTokenIds(options);
     let NFTWithMetadata = await fetchNFTMetadata(NFTs.result);
-    renderInventory(NFTWithMetadata);
+    let ownerData = await getOwnerData();
+    renderInventory(NFTWithMetadata, ownerData);
 }
 
 initializeApp();
